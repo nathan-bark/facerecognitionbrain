@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import ParticlesBg from "particles-bg";
-import Clarifai from "clarifai";
+// import Clarifai from "clarifai";
 import Navigation from "./Components/Navigation/Navigation";
 import Logo from "./Components/Logo/Logo";
 import ImageLinkForm from "./Components/ImageLinkForm/ImageLinkForm";
@@ -17,13 +17,33 @@ const MODEL_VERSION_ID = "6dc7e46bc9124c5c8824be4822abe105";
 function App() {
   let [input, setInput] = useState("");
   let [IMAGE_URL, setIMAGE_URL] = useState("");
+  let [boxes, setBoxes] = useState({});
+
+  const calculateFaceLocation = (data) => {
+    const clarifaiFace =
+      data.outputs[0].data.regions[0].region_info.bounding_box;
+    const image = document.getElementById("inputImage");
+    const width = Number(image.width);
+    const height = Number(image.height);
+    return {
+      leftCol: clarifaiFace.left_col * width,
+      topRow: clarifaiFace.top_row * height,
+      rightCol: width - clarifaiFace.right_col * width,
+      bottomRow: height - clarifaiFace.bottom_row * height,
+    };
+  };
+
+  const displayFaceBox = (box) => {
+    setBoxes(box);
+    console.log(box);
+  };
 
   const onChange = (e) => {
     setInput(e.target.value);
   };
 
   const onClick = () => {
-    setIMAGE_URL(input)
+    setIMAGE_URL(input);
 
     const raw = JSON.stringify({
       user_app_id: {
@@ -50,10 +70,6 @@ function App() {
       body: raw,
     };
 
-    // NOTE: MODEL_VERSION_ID is optional, you can also call prediction with the MODEL_ID only
-    // https://api.clarifai.com/v2/models/{YOUR_MODEL_ID}/outputs
-    // this will default to the latest version_id
-
     fetch(
       "https://api.clarifai.com/v2/models/" +
         MODEL_ID +
@@ -63,8 +79,11 @@ function App() {
       requestOptions
     )
       .then((response) => response.json())
-      .then((result) => console.log(result.outputs[0].data.regions[0].region_info.bounding_box))
-      .catch(error => console.log(error))
+      .then((result) => {
+        displayFaceBox(calculateFaceLocation(result));
+      })
+
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -74,7 +93,7 @@ function App() {
       <Rank />
       <ImageLinkForm onChange={onChange} onClick={onClick} />
       <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
-      <FaceRecognition picToDetect={IMAGE_URL} />
+      <FaceRecognition picToDetect={IMAGE_URL} boxes={boxes} />
     </div>
   );
 }
