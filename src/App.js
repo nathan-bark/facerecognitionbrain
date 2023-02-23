@@ -17,20 +17,21 @@ const MODEL_VERSION_ID = "6dc7e46bc9124c5c8824be4822abe105";
 function App() {
   let [input, setInput] = useState("");
   let [IMAGE_URL, setIMAGE_URL] = useState("");
-  let [boxes, setBoxes] = useState({});
+  let [boxes, setBoxes] = useState([]);
 
   const calculateFaceLocation = (data) => {
     const clarifaiFace =
-      data.outputs[0].data.regions[0].region_info.bounding_box;
+      data.outputs[0].data.regions.map(region => region.region_info.bounding_box)
     const image = document.getElementById("inputImage");
     const width = Number(image.width);
     const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - clarifaiFace.right_col * width,
-      bottomRow: height - clarifaiFace.bottom_row * height,
-    };
+    return clarifaiFace.map(face => {
+      return {
+      leftCol: face.left_col * width,
+      topRow: face.top_row * height,
+      rightCol: width - (face.right_col * width),
+      bottomRow: height - (face.bottom_row * height),
+  }}) 
   };
 
   const displayFaceBox = (box) => {

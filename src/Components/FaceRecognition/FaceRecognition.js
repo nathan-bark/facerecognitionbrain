@@ -12,15 +12,22 @@ const FaceRecognition = ({ picToDetect, boxes }) => {
           width="500px"
           height="auto"
         />
-        <div
-          className="bounding-box"
-          style={{
-            top: boxes.topRow,
-            left: boxes.leftCol,
-            right: boxes.rightCol,
-            bottom: boxes.bottomRow,
-          }}
-        ></div>
+
+        {boxes.map((box, i) => {
+          const { topRow, rightCol, bottomRow, leftCol } = box;
+          return (
+            <div
+              key={i}
+              className="bounding-box"
+              style={{
+                top: topRow,
+                left: leftCol,
+                right: rightCol,
+                bottom: bottomRow,
+              }}
+            ></div>
+          );
+        })}
       </div>
     </div>
   );
