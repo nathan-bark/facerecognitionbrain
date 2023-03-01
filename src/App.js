@@ -8,6 +8,7 @@ import ImageLinkForm from "./Components/ImageLinkForm/ImageLinkForm";
 import Rank from "./Components/Rank/Rank";
 import FaceRecognition from "./Components/FaceRecognition/FaceRecognition";
 import SignInForm from "./Components/SignInForm/SignInForm";
+import Register from "./Components/Register/Register";
 
 const PAT = "48d7983110e448a2a47f6aa43ff7b988";
 const USER_ID = "nathan_bark_4";
@@ -19,6 +20,8 @@ function App() {
   let [input, setInput] = useState("");
   let [IMAGE_URL, setIMAGE_URL] = useState("");
   let [boxes, setBoxes] = useState([]);
+  let [route, setRoute] = useState("signin");
+  let [isSignedIn, setIsSignedIn] = useState(false);
 
   const calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions.map(
@@ -89,15 +92,32 @@ function App() {
       .catch((error) => console.log(error));
   };
 
+  const onRouteChange = (newRoute) => {
+    if (newRoute === "home") {
+      setIsSignedIn(true);
+    } else {
+      setIsSignedIn(false);
+    }
+
+    setRoute(newRoute);
+  };
+
   return (
     <div className="App">
-      <Navigation />
+      <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
       <Logo />
-      <SignInForm />
-      <Rank />
-      <ImageLinkForm onChange={onChange} onClick={onClick} />
-      <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
-      <FaceRecognition picToDetect={IMAGE_URL} boxes={boxes} />
+      {route === "signin" ? (
+        <SignInForm onRouteChange={onRouteChange} />
+      ) : route === "register" ? (
+        <Register onRouteChange={onRouteChange} />
+      ) : (
+        <div>
+          <Rank />
+          <ImageLinkForm onChange={onChange} onClick={onClick} />
+          <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
+          <FaceRecognition picToDetect={IMAGE_URL} boxes={boxes} />
+        </div>
+      )}
     </div>
   );
 }
