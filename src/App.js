@@ -7,6 +7,7 @@ import Logo from "./Components/Logo/Logo";
 import ImageLinkForm from "./Components/ImageLinkForm/ImageLinkForm";
 import Rank from "./Components/Rank/Rank";
 import FaceRecognition from "./Components/FaceRecognition/FaceRecognition";
+import SignInForm from "./Components/SignInForm/SignInForm";
 
 const PAT = "48d7983110e448a2a47f6aa43ff7b988";
 const USER_ID = "nathan_bark_4";
@@ -20,23 +21,24 @@ function App() {
   let [boxes, setBoxes] = useState([]);
 
   const calculateFaceLocation = (data) => {
-    const clarifaiFace =
-      data.outputs[0].data.regions.map(region => region.region_info.bounding_box)
+    const clarifaiFace = data.outputs[0].data.regions.map(
+      (region) => region.region_info.bounding_box
+    );
     const image = document.getElementById("inputImage");
     const width = Number(image.width);
     const height = Number(image.height);
-    return clarifaiFace.map(face => {
+    return clarifaiFace.map((face) => {
       return {
-      leftCol: face.left_col * width,
-      topRow: face.top_row * height,
-      rightCol: width - (face.right_col * width),
-      bottomRow: height - (face.bottom_row * height),
-  }}) 
+        leftCol: face.left_col * width,
+        topRow: face.top_row * height,
+        rightCol: width - face.right_col * width,
+        bottomRow: height - face.bottom_row * height,
+      };
+    });
   };
 
   const displayFaceBox = (box) => {
     setBoxes(box);
-    console.log(box);
   };
 
   const onChange = (e) => {
@@ -91,6 +93,7 @@ function App() {
     <div className="App">
       <Navigation />
       <Logo />
+      <SignInForm />
       <Rank />
       <ImageLinkForm onChange={onChange} onClick={onClick} />
       <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
