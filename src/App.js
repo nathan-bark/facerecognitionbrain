@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState } from "react";
 import "./App.css";
 import ParticlesBg from "particles-bg";
 // import Clarifai from "clarifai";
@@ -22,6 +22,23 @@ function App() {
   let [boxes, setBoxes] = useState([]);
   let [route, setRoute] = useState("signin");
   let [isSignedIn, setIsSignedIn] = useState(false);
+  let [user, setUser] = useState({
+    id: "",
+    name: "",
+    email: "",
+    entries: 0,
+    joined: "",
+  });
+
+  const loadUser = (data) => {
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined,
+    });
+  };
 
   const calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions.map(
@@ -86,6 +103,19 @@ function App() {
     )
       .then((response) => response.json())
       .then((result) => {
+        fetch('http://localhost:3000/image', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            id: user.id
+          })
+        })
+        .then(res => res.json())
+        .then(count => {
+          setUser({...user, entries: count })
+        })
+
+
         displayFaceBox(calculateFaceLocation(result));
       })
 
@@ -107,12 +137,16 @@ function App() {
       <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
       <Logo />
       {route === "signin" ? (
-        <SignInForm onRouteChange={onRouteChange} />
+        <SignInForm 
+        loadUser={loadUser}
+        onRouteChange={onRouteChange} />
       ) : route === "register" ? (
-        <Register onRouteChange={onRouteChange} />
+        <Register 
+        loadUser={loadUser}
+        onRouteChange={onRouteChange} />
       ) : (
         <div>
-          <Rank />
+          <Rank userName={user.name} userEntries={user.entries} />
           <ImageLinkForm onChange={onChange} onClick={onClick} />
           <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
           <FaceRecognition picToDetect={IMAGE_URL} boxes={boxes} />
