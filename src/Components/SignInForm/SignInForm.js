@@ -26,7 +26,10 @@ const SignInForm = ({ onRouteChange, loadUser }) => {
       if (data.id){
         loadUser(data);
         onRouteChange("home");
-      } 
+      } else {
+        const wrongPassword = document.getElementById('error-message');
+        wrongPassword.classList.remove('dn');
+      }
     })
     
   };
@@ -62,6 +65,9 @@ const SignInForm = ({ onRouteChange, loadUser }) => {
               />
             </div>
           </fieldset>
+          <div>
+            <p id="error-message" className="dn white underline f4 mt0">Wrong email or password!</p>
+          </div>
           <div className="">
             <input
               className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"

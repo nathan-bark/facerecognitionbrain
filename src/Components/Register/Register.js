@@ -30,7 +30,7 @@ const Register = ({ onRouteChange, loadUser }) => {
     })
     .then(res => res.json())
     .then(data => {
-      if(data){
+      if(data.id){
         loadUser(data);
         onRouteChange('home')
       }
@@ -64,7 +64,7 @@ const Register = ({ onRouteChange, loadUser }) => {
                 type="email"
                 name="email-address"
                 id="email-address"
-                onChange={onEmailChange}
+                onChange={onEmailChange}                
               />
             </div>
             <div className="mv3">
@@ -76,7 +76,7 @@ const Register = ({ onRouteChange, loadUser }) => {
                 type="password"
                 name="password"
                 id="password"
-                onChange={onPasswordChange}
+                onChange={onPasswordChange}   
               />
             </div>
           </fieldset>

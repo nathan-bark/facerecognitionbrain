@@ -10,6 +10,7 @@
     "particles-bg": "^2.5.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
     "react-parallax-tilt": "^1.7.102",
     "react-scripts": "5.0.1",
     "react-tilty": "^3.0.0",

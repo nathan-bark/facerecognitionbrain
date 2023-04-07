@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import ParticlesBg from "particles-bg";
 // import Clarifai from "clarifai";
@@ -10,11 +10,15 @@ import FaceRecognition from "./Components/FaceRecognition/FaceRecognition";
 import SignInForm from "./Components/SignInForm/SignInForm";
 import Register from "./Components/Register/Register";
 
-const PAT = "48d7983110e448a2a47f6aa43ff7b988";
-const USER_ID = "nathan_bark_4";
-const APP_ID = "face-recog-project";
-const MODEL_ID = "face-detection";
-const MODEL_VERSION_ID = "6dc7e46bc9124c5c8824be4822abe105";
+
+
+const initialUserState = {
+  id: "",
+  name: "",
+  email: "",
+  entries: 0,
+  joined: "",
+};
 
 function App() {
   let [input, setInput] = useState("");
@@ -22,13 +26,14 @@ function App() {
   let [boxes, setBoxes] = useState([]);
   let [route, setRoute] = useState("signin");
   let [isSignedIn, setIsSignedIn] = useState(false);
-  let [user, setUser] = useState({
-    id: "",
-    name: "",
-    email: "",
-    entries: 0,
-    joined: "",
-  });
+  let [user, setUser] = useState(initialUserState);
+
+  const resetState = () => {
+    setUser(initialUserState);
+    setInput("");
+    setIMAGE_URL("");
+    setBoxes([]);
+  };
 
   const loadUser = (data) => {
     setUser({
@@ -67,57 +72,31 @@ function App() {
 
   const onClick = () => {
     setIMAGE_URL(input);
-
-    const raw = JSON.stringify({
-      user_app_id: {
-        user_id: USER_ID,
-        app_id: APP_ID,
-      },
-      inputs: [
-        {
-          data: {
-            image: {
-              url: input,
-            },
-          },
-        },
-      ],
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: "Key " + PAT,
-      },
-      body: raw,
-    };
-
-    fetch(
-      "https://api.clarifai.com/v2/models/" +
-        MODEL_ID +
-        "/versions/" +
-        MODEL_VERSION_ID +
-        "/outputs",
-      requestOptions
-    )
+    fetch("http://localhost:3000/imageurl", {
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        input: input,
+      }),
+    })
       .then((response) => response.json())
       .then((result) => {
-        fetch('http://localhost:3000/image', {
-          method: 'put',
-          headers: {'Content-Type': 'application/json'},
+        if (result){
+        fetch("http://localhost:3000/image", {
+          method: "put",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            id: user.id
+            id: user.id,
+          }),
+        })
+          .then((res) => res.json())
+          .then((count) => {
+            setUser({ ...user, entries: count });
           })
-        })
-        .then(res => res.json())
-        .then(count => {
-          setUser({...user, entries: count })
-        })
-
+          .catch(err => console.log(err))
 
         displayFaceBox(calculateFaceLocation(result));
-      })
+      }})
 
       .catch((error) => console.log(error));
   };
@@ -127,6 +106,7 @@ function App() {
       setIsSignedIn(true);
     } else {
       setIsSignedIn(false);
+      resetState();
     }
 
     setRoute(newRoute);
@@ -136,14 +116,17 @@ function App() {
     <div className="App">
       <Navigation onRouteChange={onRouteChange} isSignedIn={isSignedIn} />
       <Logo />
+      <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
       {route === "signin" ? (
-        <SignInForm 
-        loadUser={loadUser}
-        onRouteChange={onRouteChange} />
+        <div>
+          <SignInForm loadUser={loadUser} onRouteChange={onRouteChange} />
+          <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
+        </div>
       ) : route === "register" ? (
-        <Register 
-        loadUser={loadUser}
-        onRouteChange={onRouteChange} />
+        <div>
+          <Register loadUser={loadUser} onRouteChange={onRouteChange} />
+          <ParticlesBg type="cobweb" bg={true} color="#ffffff" num={55} />
+        </div>
       ) : (
         <div>
           <Rank userName={user.name} userEntries={user.entries} />
