@@ -72,7 +72,7 @@ function App() {
 
   const onClick = () => {
     setIMAGE_URL(input);
-    fetch("https://face-recognition-brain-gubr.onrender.com/imageurl", {
+    fetch("https://face-recognition-back-end.onrender.com/imageurl", {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -82,7 +82,7 @@ function App() {
       .then((response) => response.json())
       .then((result) => {
         if (result){
-        fetch("https://face-recognition-brain-gubr.onrender.com/image", {
+        fetch("https://face-recognition-back-end.onrender.com/image", {
           method: "put",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
