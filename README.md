@@ -12,6 +12,8 @@ A web app that allows the user to upload a photo and then detects and highlights
 
 **Server:** Node, Express
 
+**Database:** PostgreSQL
+
 **Node Packages:** React Hook Form, Clarifai, Particles-bg, Tachyons, React Tilty
 
 
